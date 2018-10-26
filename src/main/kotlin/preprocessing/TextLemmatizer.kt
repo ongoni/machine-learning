@@ -25,10 +25,14 @@ object TextLemmatizer {
         }
     }
 
-    private fun escapeWord(word: String) =
-            Regex("([а-яё]+)\\|")
-                    .find(word)!!
-                    .groups[1]!!
-                    .value
+    private fun escapeWord(word: String): String? {
+        val match = Regex("([а-яё]+)\\|").find(word)
+
+        if (match != null) {
+            return match.groups[1]?.value
+        }
+
+        return null
+    }
 
 }
