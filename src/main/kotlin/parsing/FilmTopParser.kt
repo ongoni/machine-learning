@@ -5,7 +5,6 @@ import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
 import java.util.*
-import java.util.logging.Logger
 
 object FilmTopParser {
 
@@ -59,7 +58,6 @@ object FilmTopParser {
         return (1..count)
                 .map { doc.select("tr#top250_place_$it a.all[href]").toString() }
                 .map { regex.find(it)!!.groups[1]!!.value }
-                .toList()
     }
 
     fun getFilmReviews(filmIdentifier: String, reviewCount: Int = DEFAULT_REVIEW_COUNT): List<String> {
@@ -76,7 +74,7 @@ object FilmTopParser {
                 var document = connection.get()
 
                 while (document.baseUri().contains("showcaptcha")) {
-                    println("[${Date()}] Waiting...")
+                    ParsingLogger.log("Waiting...")
                     Thread.sleep(900000)
                     document = connection.get()
                 }
