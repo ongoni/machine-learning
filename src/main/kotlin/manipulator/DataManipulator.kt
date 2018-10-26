@@ -54,13 +54,13 @@ object DataManipulator {
 
         val type = words
                 .first { x -> x.contains(Regex("good|bad|neutral")) }
-                .takeWhile { it.isLetter() }
         words.remove(type)
 
         return words
                 .asSequence()
                 .filterNot { it.isEmpty() }
-                .toList() to type
+                .toList() to
+                type.takeWhile { it.isLetter() }
     }
 
 }
