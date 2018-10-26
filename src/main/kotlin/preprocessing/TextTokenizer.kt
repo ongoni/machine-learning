@@ -1,31 +1,26 @@
 package preprocessing
 
+import logger.ParsingLogger
+
 object TextTokenizer {
 
     private val delimiters = arrayOf(" ", ",", ".", "!", "?", ":", ";", "/", "-", "«", "»", "—", "\r", "\t", "\n", "(", ")")
-    private val unnecessaryWords = setOf(
-            "на", "в", "с", "под", "перед", "до", "о", "из-за", "по", "от", "для",
-            "без", "близ", "ввиду", "между", "возле", "вокруг", "впереди", "вследствие",
-            "из", "из-под", "кроме", "около", "подле", "после", "прежде", "благодаря",
-            "вопреки", "согласно", "соответственно", "сквозь", "об", "за", "при",
-            "обо", "про", "у", "насчёт", "насчет", "спустя", "погодя", "несмотря",
-            "вдоль", "мимо", "внутри", "а", "и", "чтобы", "если", "потому", "что", "то",
-            "или", "тоже", "также", "как", "так", "либо", "не", "ни", "будто", "ли",
-            "когда", "пока", "только", "прежде", "едва", "ибо", "оттого", "бы", "подобно",
-            "б", "давай", "пусть", "неужели", "разве", "вот", "вон", "именно", "прямо",
-            "точь", "лишь", "исключительно", "почти", "даже", "же", "уж", "всё", "таки",
-            "ах", "ой", "ба", "да", "фу", "тьфу", "эй", "эх", "ай",
-            "good", "bad", "neutral"
-    )
 
     fun getTextTokens(text: String): List<String> {
+        ParsingLogger.log("Tokenizing...")
+
         val result = text.split(*delimiters)
                 .asSequence()
                 .map { it.toLowerCase().dropWhile { x -> x.isDigit() } }
                 .toMutableList()
-        result.removeIf { x -> unnecessaryWords.contains(x) || x.isEmpty() }
 
-        return result.toList()
+        result.removeIf { x -> x.contains(Regex("good|bad|neutral|\\.\\.\\.|\\.\\.")) || x.isEmpty() }
+
+        return result
+                .asSequence()
+                .map { TextLemmatizer.lemmatize(it) }
+                .toList()
+                .filterNotNull()
     }
 
 }
