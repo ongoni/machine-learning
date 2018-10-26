@@ -27,22 +27,22 @@ object DataManipulator {
         }
     }
 
-    fun getTrainingSet(): List<Pair<List<String>, String>> =
+    fun getTrainingSet(count: Int = 200): List<Pair<List<String>, String>> =
             File(TOKEN_FOLDER)
                     .listFiles()
                     .filter { x -> x.name
                             .takeWhile { it != ' ' }
-                            .toInt() < 201
+                            .toInt() <= count
                     }
                     .map { fileToReview(it) }
 
-    fun getClassifySet(): List<Pair<List<String>, String>> =
+    fun getClassifySet(count: Int = 200): List<Pair<List<String>, String>> =
             File(TOKEN_FOLDER)
                     .listFiles()
                     .filter {
                         x -> x.name
                             .takeWhile { it != ' ' }
-                            .toInt() > 200
+                            .toInt() > count
                     }
                     .map { fileToReview(it) }
 
