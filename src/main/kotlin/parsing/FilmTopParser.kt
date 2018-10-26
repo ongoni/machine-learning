@@ -43,15 +43,19 @@ object FilmTopParser {
         val top250 = File(htmlFolder, "top250.html")
         if (!top250.exists()) {
             top250.printWriter().use {
+                var document = connection.get()
+
+                while (document.baseUri().contains("showcaptcha")) {
+                    ParsingLogger.log("Waiting...")
+                    Thread.sleep(900000)
+                    document = connection.get()
+                }
+
                 it.print(connection.get().toString())
             }
         }
 
-        val doc = if (top250.exists()) {
-            Jsoup.parse(top250.readText())
-        } else {
-            connection.get()
-        }
+        val doc = Jsoup.parse(top250.readText())
 
         val regex = Regex("/film/(.+)/(.+)/")
 
@@ -70,7 +74,7 @@ object FilmTopParser {
 
         val filmPage = File(htmlFolder, "$filmIdentifier.html")
         if (!filmPage.exists()) {
-            File(htmlFolder, "$filmIdentifier.html").printWriter().use {
+            filmPage.printWriter().use {
                 var document = connection.get()
 
                 while (document.baseUri().contains("showcaptcha")) {
