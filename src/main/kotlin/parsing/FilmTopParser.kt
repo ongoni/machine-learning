@@ -1,9 +1,11 @@
 package parsing
 
+import logger.ParsingLogger
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
 import java.util.*
+import java.util.logging.Logger
 
 object FilmTopParser {
 
@@ -32,6 +34,8 @@ object FilmTopParser {
             = "https://www.kinopoisk.ru/film/$filmIdentifier/ord/rating/perpage/$reviewCount/#list"
 
     fun getTopFilmsIdentifiers(count: Int = DEFAULT_FILM_COUNT): List<String> {
+        ParsingLogger.log("Top 250 parsing...")
+
         val connection = Jsoup.connect(FILM_TOP_URL)
                 .userAgent(userAGent)
                 .referrer(REFERRER)
@@ -59,28 +63,29 @@ object FilmTopParser {
     }
 
     fun getFilmReviews(filmIdentifier: String, reviewCount: Int = DEFAULT_REVIEW_COUNT): List<String> {
+        ParsingLogger.log("$filmIdentifier reviews parsing...")
+
         val connection = Jsoup.connect(getFilmReviewsURL(filmIdentifier, reviewCount))
                 .userAgent(userAGent)
                 .referrer(REFERRER)
                 .cookies(cookies)
 
-        while (connection.get().baseUri().contains("showcaptcha")) {
-            println("[${Date()}] Waiting...")
-            Thread.sleep(900000)
-        }
-
         val filmPage = File(htmlFolder, "$filmIdentifier.html")
         if (!filmPage.exists()) {
             File(htmlFolder, "$filmIdentifier.html").printWriter().use {
+                var document = connection.get()
+
+                while (document.baseUri().contains("showcaptcha")) {
+                    println("[${Date()}] Waiting...")
+                    Thread.sleep(900000)
+                    document = connection.get()
+                }
+
                 it.print(connection.get().toString())
             }
         }
 
-        val doc = if (filmPage.exists()) {
-            Jsoup.parse(filmPage.readText())
-        } else {
-            connection.get()
-        }
+        val doc = Jsoup.parse(filmPage.readText())
 
         val result = mutableListOf<String>()
         doc.select(".clear_all .reviewItem .response").forEach {
