@@ -1,5 +1,6 @@
 package preprocessing
 
+import logger.ParsingLogger
 import java.io.File
 
 object TextTokenHandler {
@@ -7,6 +8,8 @@ object TextTokenHandler {
     private const val DEFAULT_FOLDER_PATH = "film-reviews/tokens"
 
     fun saveReviewsTokens(filmIdentifier: String, reviewsTokens: Iterable<Iterable<String>>, index: Int) {
+        ParsingLogger.log("Saving $filmIdentifier reviews tokens...")
+
         val folder = File(DEFAULT_FOLDER_PATH)
         folder.mkdirs()
 
