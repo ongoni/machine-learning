@@ -7,7 +7,7 @@ object TextTokenHandler {
 
     private const val DEFAULT_FOLDER_PATH = "film-reviews/tokens"
 
-    fun saveReviewsTokens(filmIdentifier: String, reviewsTokens: Iterable<Iterable<String>>, index: Int) {
+    fun saveReviewsTokens(filmIdentifier: String, reviewsTokens: Iterable<Pair<Iterable<String>, String>>, index: Int) {
         ParsingLogger.log("Saving $filmIdentifier reviews tokens...")
 
         val folder = File(DEFAULT_FOLDER_PATH)
@@ -18,7 +18,7 @@ object TextTokenHandler {
             file.createNewFile()
 
             file.printWriter().use {
-                it.println(review.toString() + System.lineSeparator())
+                it.println(review.second + System.lineSeparator() + review.first.toString() + System.lineSeparator())
             }
         }
     }
