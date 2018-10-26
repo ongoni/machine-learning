@@ -18,7 +18,7 @@ class App {
                 FilmReviewHandler.saveReviews(identifier, reviews, index + 1)
                 TextTokenHandler.saveReviewsTokens(identifier, reviewsTokens, index + 1)
 
-                Thread.sleep((2..5).random() * 5000L)
+//                Thread.sleep((2..5).random() * 5000L)
             }
         }
     }
