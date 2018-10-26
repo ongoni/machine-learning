@@ -30,10 +30,10 @@ class App {
                 }
             }
 
-            println(
-                    "correct - ${(correct.toDouble() / (correct + incorrect)).format(3)}\n" +
-                            "incorrect - ${(incorrect.toDouble() / (correct + incorrect)).format(3)}"
-            )
+            println("correct - ${(100 * correct.toDouble() / (correct + incorrect)).format(2)}%\n" +
+                    "total: $correct")
+            println("incorrect - ${(100 * incorrect.toDouble() / (correct + incorrect)).format(3)}%\n" +
+                    "total: $incorrect")
         }
     }
 
