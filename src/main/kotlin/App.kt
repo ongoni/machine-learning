@@ -1,25 +1,34 @@
-import parsing.FilmReviewHandler
-import parsing.FilmTopParser
-import preprocessing.TextTokenHandler
-import preprocessing.TextTokenizer
-import utils.random
+import classifier.ReviewClassifier
+import manipulator.DataManipulator
 
 class App {
 
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val filmIdentifiers = FilmTopParser.getTopFilmsIdentifiers()
+            DataManipulator.parseAndSaveReviews(false)
 
-            filmIdentifiers.forEachIndexed { index, identifier ->
-                val reviews = FilmTopParser.getFilmReviews(identifier)
-                val reviewsTokens = reviews.map { TextTokenizer.getTextTokens(it) }
+            val classifier = ReviewClassifier()
+            val trainingSet = DataManipulator.getTrainingSet()
 
-                FilmReviewHandler.saveReviews(identifier, reviews, index + 1)
-                TextTokenHandler.saveReviewsTokens(identifier, reviewsTokens, index + 1)
+            classifier.train(trainingSet)
 
-//                Thread.sleep((2..5).random() * 5000L)
+            val classifySet = DataManipulator.getClassifySet()
+
+            var correct = 0
+            var incorrect = 0
+
+            classifySet.forEach {
+                val result = classifier.classify(it.first)
+
+                if (result.first == it.second) {
+                    correct++
+                } else {
+                    incorrect++
+                }
             }
+
+            println("correct - ${correct / (correct + incorrect)}\nincorrect - ${incorrect / (correct + incorrect)}")
         }
     }
 
