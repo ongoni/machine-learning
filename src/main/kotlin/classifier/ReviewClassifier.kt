@@ -1,7 +1,7 @@
 package classifier
 
 import utils.inc
-import java.lang.Exception
+import kotlin.math.ln
 
 class ReviewClassifier {
     // кол-во раз, когда слово отнесено к какому-то классу - map[слово][класс] = кол-во
@@ -9,7 +9,7 @@ class ReviewClassifier {
     // общее кол-во рецензий, отнесённых к какому-то классу - map[класс] = кол-во
     private val countOfReviewsAddedToType = mutableMapOf("good" to 0, "bad" to 0, "neutral" to 0)
     // кол-во слов, отнесённых к какому-то классу - map[класс] = кол-во
-    private val countOfWordAddedToType = mutableMapOf("good" to 0, "bad" to 0, "neutral" to 0)
+    private val countOfWordsAddedToType = mutableMapOf("good" to 0, "bad" to 0, "neutral" to 0)
     // общее кол-во рецензий
     private var reviewsTotalCount = 0
 
@@ -24,11 +24,13 @@ class ReviewClassifier {
                 countOfWordAddsToType[word] = mutableMapOf()
             }
             if (!countOfWordAddsToType[word]!!.containsKey(type)) {
-                countOfWordAddsToType[word]!![type] = 0
+                types.forEach {
+                    countOfWordAddsToType[word]!![it] = 0
+                }
             }
 
             countOfWordAddsToType[word]?.inc(type)
-            countOfWordAddedToType.inc(type)
+            countOfWordsAddedToType.inc(type)
         }
     }
 
@@ -39,7 +41,7 @@ class ReviewClassifier {
     }
 
     fun classify(review: Iterable<String>): Pair<String, Double> {
-        var score = 0.0
+        var score = Double.NEGATIVE_INFINITY
         var prediction = ""
 
         types.forEach { type ->
@@ -54,40 +56,21 @@ class ReviewClassifier {
         return prediction to score
     }
 
-    private fun getTypeProbability(type: String) =
-            countOfReviewsAddedToType[type]!!.toDouble() / reviewsTotalCount
-
-    private fun getWordGivenClassProbability(word: String, type: String): Double {
-        if (!countOfWordAddsToType.containsKey(word) || (countOfWordAddsToType.containsKey(word)
-                        && !countOfWordAddsToType[word]!!.containsKey(type))) {
-            return 1.0
-        }
-
-        var result = 1.0
-        try {
-            result = (countOfWordAddsToType[word]!![type]!! + 1).toDouble() /
-                    countOfWordAddedToType[type]!! + getTotalWordsCount()
-        } catch (ex: Exception) {
-            println(ex.message)
-        }
-
-        return result
-    }
-
     private fun getProbability(review: Iterable<String>, type: String): Double {
-        var result = getTypeProbability(type)
+        val totalWordCount = countOfWordAddsToType.keys.size
+        var result = ln(countOfReviewsAddedToType[type]!!.toDouble() / reviewsTotalCount)
 
         review.forEach { word ->
-            result *= getWordGivenClassProbability(word, type)
-        }
+            val wordAddsCount = if (countOfWordAddsToType.containsKey(word)) {
+                countOfWordAddsToType[word]!![type]!!
+            } else 0
 
-        val temp = review.fold(result) { sum, word ->
-            sum * getWordGivenClassProbability(word, type)
+            val numerator = (1 + wordAddsCount).toDouble()
+            val denominator = totalWordCount + countOfWordsAddedToType[type]!!
+            result += ln(numerator / denominator)
         }
 
         return result
     }
-
-    private fun getTotalWordsCount() = countOfWordAddsToType.keys.size
 
 }
