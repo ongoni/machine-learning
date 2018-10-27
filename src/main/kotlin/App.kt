@@ -8,7 +8,7 @@ class App {
         @JvmStatic
         fun main(args: Array<String>) {
 //            DataManipulator.parseAndSaveReviews(false)
-            val filmCount = 50
+            val filmCount = 200
 
             val classifier = ReviewClassifier()
             val trainingSet = DataManipulator.getTrainingSet(filmCount)
