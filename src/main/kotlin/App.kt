@@ -8,7 +8,7 @@ class App {
         @JvmStatic
         fun main(args: Array<String>) {
 //            DataManipulator.parseAndSaveReviews(false)
-            val filmCount = 240
+            val filmCount = 50
 
             val classifier = ReviewClassifier()
             val trainingSet = DataManipulator.getTrainingSet(filmCount)
@@ -24,6 +24,10 @@ class App {
             }
 
             println(statistics.getSimpleStatistics())
+            println()
+            statistics.getPrecisionRecall().forEach {
+                println(it)
+            }
         }
     }
 
