@@ -4,7 +4,6 @@ import logger.ParsingLogger
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
-import java.util.*
 
 object FilmTopParser {
 
@@ -19,7 +18,7 @@ object FilmTopParser {
             .referrer(REFERRER)
             .execute()
             .cookies()
-    private const val userAGent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"
+    private const val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"
 
     private var htmlFolder: File = File("html")
 
@@ -36,7 +35,7 @@ object FilmTopParser {
         ParsingLogger.log("Top 250 parsing...")
 
         val connection = Jsoup.connect(FILM_TOP_URL)
-                .userAgent(userAGent)
+                .userAgent(userAgent)
                 .referrer(REFERRER)
                 .cookies(cookies)
 
@@ -68,7 +67,7 @@ object FilmTopParser {
         ParsingLogger.log("$filmIdentifier reviews parsing...")
 
         val connection = Jsoup.connect(getFilmReviewsURL(filmIdentifier, reviewCount))
-                .userAgent(userAGent)
+                .userAgent(userAgent)
                 .referrer(REFERRER)
                 .cookies(cookies)
 
