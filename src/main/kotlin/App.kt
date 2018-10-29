@@ -1,5 +1,6 @@
 import classifier.ReviewClassifier
 import manipulator.DataManipulator
+import org.apache.lucene.morphology.russian.RussianLuceneMorphology
 import statistics.ClassifierStatistics
 
 class App {
@@ -7,7 +8,9 @@ class App {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-//            DataManipulator.parseAndSaveReviews(false)
+            val reviews = DataManipulator.parseReviews(false)
+            DataManipulator.saveReviews(reviews)
+
             val filmCount = 200
 
             val classifier = ReviewClassifier()

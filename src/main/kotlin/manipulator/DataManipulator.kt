@@ -11,19 +11,31 @@ object DataManipulator {
 
     private const val TOKEN_FOLDER = "film-reviews/tokens"
 
-    fun parseAndSaveReviews(sleeping: Boolean = true) {
-        val filmIdentifiers = FilmTopParser.getTopFilmsIdentifiers()
+    fun parseReviews(sleeping: Boolean = true): Map<String, List<String>> {
+        val identifiers = FilmTopParser.getTopFilmsIdentifiers()
 
-        filmIdentifiers.forEachIndexed { index, identifier ->
-            val reviews = FilmTopParser.getFilmReviews(identifier)
-            val reviewsTokens = reviews.map { TextTokenizer.getTextTokens(it) }
-
-            FilmReviewHandler.saveReviews(identifier, reviews, index + 1)
-            TextTokenHandler.saveReviewsTokens(identifier, reviewsTokens, index + 1)
+        val map = mutableMapOf<String, List<String>>()
+        identifiers.forEach {
+            map[it] = FilmTopParser.getFilmReviews(it)
 
             if (sleeping) {
                 Thread.sleep((2..5).random() * 5000L)
             }
+        }
+
+        return map
+    }
+
+    fun saveReviews(reviewsMap: Map<String, List<String>>) {
+        var index = 1
+
+        reviewsMap.forEach { identifier, reviews ->
+            val reviewsTokens = reviews.map { TextTokenizer.getTextTokens(it) }
+
+            FilmReviewHandler.saveReviews(identifier, reviews, index)
+            TextTokenHandler.saveReviewsTokens(identifier, reviewsTokens, index)
+
+            index++
         }
     }
 
